@@ -63,7 +63,7 @@ def load_config(path: Path) -> Config:
         data = json.load(fh)
 
     try:
-        source = Path(data["source_file"])
+        source_raw = Path(data["source_file"])
         year = int(data["target_year"])
         month = int(data["target_month"])
     except KeyError as exc:
@@ -74,7 +74,11 @@ def load_config(path: Path) -> Config:
     if month not in PORTUGUESE_MONTHS:
         raise ValueError("Mês deve estar entre 1 e 12.")
 
-    output_dir = Path(data.get("output_directory", source.parent))
+    base_dir = path.parent
+    source = (base_dir / source_raw).resolve()
+
+    output_raw = Path(data.get("output_directory", "."))
+    output_dir = (base_dir / output_raw).resolve()
 
     return Config(source_file=source, target_year=year, target_month=month, output_directory=output_dir)
 
